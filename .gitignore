@@ -22,3 +22,8 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# github repos
+src/github.com/*
+src/gopkg.in/*
+bin/*
