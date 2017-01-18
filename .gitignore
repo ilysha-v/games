@@ -26,4 +26,6 @@ _testmain.go
 # github repos
 src/github.com/*
 src/gopkg.in/*
+src/golang.org/*
+src/sourcegraph.com/*
 bin/*
