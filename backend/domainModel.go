@@ -1,9 +1,8 @@
 package backend
 
-// Game is DTO model for game object
-type Game struct {
+// GameInfo is DTO model for game object
+type GameInfo struct {
 	Name      string
-	Summary   string
 	Thumbnail string
 	Platform  string
 }

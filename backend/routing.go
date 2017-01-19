@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
+
+const takeCount int = 25
 
 // Router is application router
 var Router *mux.Router
@@ -30,7 +33,24 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func gamesHandler(w http.ResponseWriter, r *http.Request) {
-	games := getGames()
+	variables := r.URL.Query()
+
+	withPaging := false
+	page := variables["page"]
+	if len(page) == 1 {
+		withPaging = true
+	}
+	var games []GameInfo
+	if !withPaging {
+		games = getGames()
+	} else {
+		pageNumber, err := strconv.Atoi(page[0])
+		if err != nil {
+			panic(err)
+		}
+		games = getGamesWithPaging(pageNumber, takeCount)
+	}
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(games); err != nil {
