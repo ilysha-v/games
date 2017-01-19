@@ -1,12 +1,12 @@
 package main
 
 import (
-	"logging"
-	"routing"
+	"github.com/ilysha-v/games/logging"
+	"github.com/ilysha-v/games/routing"
 )
 
 func main() {
 	logging.InitLogger()
-	routing.Init()
 	logging.Log.Infof("Service started")
+	routing.Init()
 }
