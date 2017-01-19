@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -29,5 +30,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func gamesHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Games list will be here")
+	games := getGames()
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(games); err != nil {
+		// todo this should response 500 and log full error
+		panic(err)
+	}
 }
