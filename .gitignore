@@ -24,8 +24,7 @@ _testmain.go
 *.prof
 
 # github repos
-src/github.com/*
-src/gopkg.in/*
-src/golang.org/*
-src/sourcegraph.com/*
-bin/*
+github.com/*
+gopkg.in/*
+golang.org/*
+sourcegraph.com/*
