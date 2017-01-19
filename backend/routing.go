@@ -1,4 +1,4 @@
-package routing
+package backend
 
 import (
 	"fmt"
@@ -12,14 +12,22 @@ var Router *mux.Router
 
 // Init is initializing method for all controllers in a serice
 func Init() {
+	InitLogger()
 	Router = mux.NewRouter()
 	Router.StrictSlash(true)
-	Router.HandleFunc("/", Index)
+	Router.HandleFunc("/", indexHandler)
+	Router.HandleFunc("/games", gamesHandler)
+
+	Log.Infof("Service started")
 
 	http.ListenAndServe(":8080", Router)
 }
 
 // Index in main page handler
-func Index(w http.ResponseWriter, r *http.Request) {
+func indexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, web service!")
+}
+
+func gamesHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Games list will be here")
 }

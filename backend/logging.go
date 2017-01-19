@@ -1,4 +1,4 @@
-package logging
+package backend
 
 import (
 	"github.com/juju/loggo"
