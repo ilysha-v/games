@@ -19,8 +19,8 @@ func Init() {
 	InitLogger()
 	Router = mux.NewRouter()
 	Router.StrictSlash(true)
-	Router.HandleFunc("/", indexHandler)
-	Router.HandleFunc("/games", gamesHandler)
+	Router.HandleFunc("/api/test", indexHandler)
+	Router.HandleFunc("/api/games", gamesHandler)
 
 	Log.Infof("Service started")
 
