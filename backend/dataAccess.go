@@ -1,6 +1,10 @@
 package backend
 
-import "gopkg.in/mgo.v2"
+import (
+	"github.com/ilysha-v/games/backend/configuration"
+
+	"gopkg.in/mgo.v2"
+)
 
 func getGames() []GameInfo {
 	session, collection := openConnection()
@@ -29,7 +33,8 @@ func getGamesWithPaging(pageNumber int, takeCount int) []GameInfo {
 }
 
 func openConnection() (*mgo.Session, *mgo.Collection) {
-	session, err := mgo.Dial("localhost")
+	databaseHost := configuration.GetDatabaseHost()
+	session, err := mgo.Dial(databaseHost)
 	if err != nil {
 		panic(err)
 	}
