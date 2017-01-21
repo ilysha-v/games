@@ -1,4 +1,19 @@
+sudo: required
+
+services:
+  - docker
+
 language: go
 
 go:
   - 1.7.x
+
+script:
+  - docker build -t games .
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker tag games ilyavasin/games
+    docker push ilyavasin/games;
+    fi
