@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/ilysha-v/games/backend/auth"
 )
 
 const takeCount int = 25
@@ -17,10 +18,18 @@ var Router *mux.Router
 // Init is initializing method for all controllers in a serice
 func Init() {
 	InitLogger()
+
+	auth.SetupAuth()
+	Log.Infof("Auth system initialized")
+
 	Router = mux.NewRouter()
 	Router.StrictSlash(true)
 	Router.HandleFunc("/api/test", indexHandler)
 	Router.HandleFunc("/api/games", gamesHandler)
+	Router.HandleFunc("/api/whoami", whoAmI)
+
+	authRouter := auth.Ab.NewRouter()
+	Router.PathPrefix("/api/auth").Handler(authRouter)
 
 	Log.Infof("Service started")
 
@@ -30,6 +39,17 @@ func Init() {
 // Index in main page handler
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, web service!")
+}
+
+func whoAmI(w http.ResponseWriter, r *http.Request) {
+	user, err := auth.Ab.CurrentUser(w, r)
+	if user != nil && err == nil {
+		currentUserName := user.(*auth.User).Email
+		fmt.Fprintf(w, "Hey, %s!", currentUserName)
+	} else {
+		Log.Infof("Error")
+	}
+
 }
 
 func gamesHandler(w http.ResponseWriter, r *http.Request) {
