@@ -1,4 +1,4 @@
-FROM golang
+FROM golang:1.6
 ENV VIEWS_PATH=/go/src/github.com/ilysha-v/games/backend/auth
 COPY . /go/src/github.com/ilysha-v/games
 
