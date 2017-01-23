@@ -1,5 +1,6 @@
 FROM golang
-ADD . /go/src/github.com/ilysha-v/games
+ENV VIEWS_PATH=/go/src/github.com/ilysha-v/games/backend/auth
+COPY . /go/src/github.com/ilysha-v/games
 
 #deps
 RUN go get github.com/gorilla/mux

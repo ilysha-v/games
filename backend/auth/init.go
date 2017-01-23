@@ -22,12 +22,15 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/justinas/nosurf"
+
+	"github.com/ilysha-v/games/backend/configuration"
 )
 
 var (
 	Ab        = authboss.New()
 	database  = NewMemStorer()
-	templates = tpl.Must(tpl.Load("backend/auth/views", "backend/auth/views/partials", "layout.html.tpl", funcs))
+	viewsPath = configuration.GetViewsPath()
+	templates = tpl.Must(tpl.Load(viewsPath+"/views", viewsPath+"/views/partials", "layout.html.tpl", funcs))
 	schemaDec = schema.NewDecoder()
 )
 
@@ -61,7 +64,7 @@ func setupAuthboss() {
 	// 	},
 	// }
 
-	b, err := ioutil.ReadFile(filepath.Join("backend/auth/views", "layout.html.tpl"))
+	b, err := ioutil.ReadFile(filepath.Join(viewsPath+"/views", "layout.html.tpl"))
 	if err != nil {
 		panic(err)
 	}
