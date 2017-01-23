@@ -11,3 +11,12 @@ func GetDatabaseHost() string {
 
 	return value
 }
+
+func GetViewsPath() string {
+	value := os.Getenv("VIEWS_PATH")
+	if value == "" {
+		return "backend/auth"
+	}
+
+	return value
+}
