@@ -26,6 +26,7 @@ func Init() {
 	Router.StrictSlash(true)
 	Router.HandleFunc("/api/test", indexHandler)
 	Router.HandleFunc("/api/games", gamesHandler)
+	Router.HandleFunc("/api/gamedetail", gameDetailHandler)
 	Router.HandleFunc("/api/whoami", whoAmI)
 
 	authRouter := auth.Ab.NewRouter()
@@ -74,6 +75,21 @@ func gamesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(games); err != nil {
+		// todo this should response 500 and log full error
+		panic(err)
+	}
+}
+
+func gameDetailHandler(w http.ResponseWriter, r *http.Request) {
+	variables := r.URL.Query()
+
+	gameId := variables["gameid"]
+	var game []FullGameInfo
+	game = getGameFullInfo(gameId[0])
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(game); err != nil {
 		// todo this should response 500 and log full error
 		panic(err)
 	}

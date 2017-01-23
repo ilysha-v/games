@@ -4,6 +4,7 @@ import (
 	"github.com/ilysha-v/games/backend/configuration"
 
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func getGames() []GameInfo {
@@ -25,6 +26,19 @@ func getGamesWithPaging(pageNumber int, takeCount int) []GameInfo {
 
 	var results []GameInfo
 	err := collection.Find(nil).Sort("name").Limit(takeCount).Skip(pageNumber * takeCount).All(&results)
+	if err != nil {
+		panic(err)
+	}
+
+	return results
+}
+
+func getGameFullInfo(gameId string) []FullGameInfo {
+	session, collection := openConnection()
+	defer session.Close()
+
+	var results []FullGameInfo
+	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(gameId)}).All(&results)
 	if err != nil {
 		panic(err)
 	}
