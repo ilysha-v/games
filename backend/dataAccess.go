@@ -6,7 +6,7 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-func getGames() []GameInfo {
+func GetGames() []GameInfo {
 	session, collection := openConnection()
 	defer session.Close()
 
@@ -19,7 +19,7 @@ func getGames() []GameInfo {
 	return results
 }
 
-func getGamesWithPaging(pageNumber int, takeCount int) []GameInfo {
+func GetGamesWithPaging(pageNumber int, takeCount int) []GameInfo {
 	session, collection := openConnection()
 	defer session.Close()
 

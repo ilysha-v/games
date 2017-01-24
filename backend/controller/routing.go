@@ -1,4 +1,4 @@
-package backend
+package controller
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/ilysha-v/games/backend"
 	"github.com/ilysha-v/games/backend/auth"
 )
 
@@ -17,21 +18,22 @@ var Router *mux.Router
 
 // Init is initializing method for all controllers in a serice
 func Init() {
-	InitLogger()
+	backend.InitLogger()
 
 	auth.SetupAuth()
-	Log.Infof("Auth system initialized")
+	backend.Log.Infof("Auth system initialized")
 
 	Router = mux.NewRouter()
 	Router.StrictSlash(true)
 	Router.HandleFunc("/api/test", indexHandler)
 	Router.HandleFunc("/api/games", gamesHandler)
+	Router.HandleFunc("/api/userinfo", userInfoHandler)
 	Router.HandleFunc("/api/whoami", whoAmI)
 
 	authRouter := auth.Ab.NewRouter()
 	Router.PathPrefix("/api/auth").Handler(authRouter)
 
-	Log.Infof("Service started")
+	backend.Log.Infof("Service started")
 
 	http.ListenAndServe(":8080", Router)
 }
@@ -47,9 +49,25 @@ func whoAmI(w http.ResponseWriter, r *http.Request) {
 		currentUserName := user.(*auth.User).Email
 		fmt.Fprintf(w, "Hey, %s!", currentUserName)
 	} else {
-		Log.Infof("Error")
+		backend.Log.Infof("Error")
 	}
+}
 
+func userInfoHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := auth.Ab.CurrentUser(w, r)
+	if user != nil && err == nil {
+		typedUser := user.(*auth.User)
+		shortUser := backend.MakeShortUser(typedUser)
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(shortUser); err != nil {
+			// todo this should response 500 and log full error
+			panic(err)
+		}
+	} else {
+		fmt.Fprintf(w, "{ }")
+	}
 }
 
 func gamesHandler(w http.ResponseWriter, r *http.Request) {
@@ -60,15 +78,16 @@ func gamesHandler(w http.ResponseWriter, r *http.Request) {
 	if len(page) == 1 {
 		withPaging = true
 	}
-	var games []GameInfo
+
+	var games []backend.GameInfo
 	if !withPaging {
-		games = getGames()
+		games = backend.GetGames()
 	} else {
 		pageNumber, err := strconv.Atoi(page[0])
 		if err != nil {
 			panic(err)
 		}
-		games = getGamesWithPaging(pageNumber, takeCount)
+		games = backend.GetGamesWithPaging(pageNumber, takeCount)
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

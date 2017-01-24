@@ -1,7 +1,7 @@
 package main
 
-import "github.com/ilysha-v/games/backend"
+import "github.com/ilysha-v/games/backend/controller"
 
 func main() {
-	backend.Init()
+	controller.Init()
 }

@@ -49,8 +49,8 @@ func setupAuthboss() {
 
 	Ab.LayoutDataMaker = layoutData
 	Ab.ViewsPath = "ab_views"
-	Ab.RegisterOKPath = "/api/auth/register"
-	Ab.AuthLoginOKPath = "/api/whoami"
+	Ab.RegisterOKPath = "/"
+	Ab.AuthLoginOKPath = "/"
 
 	// Ab.OAuth2Providers = map[string]authboss.OAuth2Provider{
 	// 	"google": authboss.OAuth2Provider{
