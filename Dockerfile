@@ -12,12 +12,12 @@ RUN go get github.com/gorilla/schema
 RUN go get github.com/gorilla/securecookie
 RUN go get github.com/gorilla/sessions
 RUN go get github.com/justinas/nosurf
-RUN go get gopkg.in/authboss.v1
-RUN go get gopkg.in/authboss.v1/auth
-RUN go get gopkg.in/authboss.v1/lock
-RUN go get gopkg.in/authboss.v1/recover
-RUN go get gopkg.in/authboss.v1/register
-RUN go get gopkg.in/authboss.v1/remember
+RUN go get github.com/ilysha-v/authboss
+RUN go get github.com/ilysha-v/authboss/auth
+RUN go get github.com/ilysha-v/authboss/lock
+RUN go get github.com/ilysha-v/authboss/recover
+RUN go get github.com/ilysha-v/authboss/register
+RUN go get github.com/ilysha-v/authboss/remember
 
 RUN go install github.com/ilysha-v/games
 ENTRYPOINT /go/bin/games

@@ -29,6 +29,7 @@ func Init() {
 	Router.HandleFunc("/api/games", gamesHandler)
 	Router.HandleFunc("/api/userinfo", userInfoHandler)
 	Router.HandleFunc("/api/whoami", whoAmI)
+	Router.HandleFunc("/api/errors", sessionErrorHandler)
 
 	authRouter := auth.Ab.NewRouter()
 	Router.PathPrefix("/api/auth").Handler(authRouter)
@@ -67,6 +68,14 @@ func userInfoHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		fmt.Fprintf(w, "{ }")
+	}
+}
+
+func sessionErrorHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := auth.Ab.InitContext(w, r)
+	value, success := ctx.SessionStorer.Get("flash_error")
+	if success {
+		fmt.Fprint(w, value)
 	}
 }
 

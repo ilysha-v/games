@@ -10,12 +10,12 @@ import (
 	"path/filepath"
 	"time"
 
-	"gopkg.in/authboss.v1"
-	_ "gopkg.in/authboss.v1/auth"
-	_ "gopkg.in/authboss.v1/lock"
-	_ "gopkg.in/authboss.v1/recover"
-	_ "gopkg.in/authboss.v1/register"
-	_ "gopkg.in/authboss.v1/remember"
+	"github.com/ilysha-v/authboss"
+	_ "github.com/ilysha-v/authboss/auth"
+	_ "github.com/ilysha-v/authboss/lock"
+	_ "github.com/ilysha-v/authboss/recover"
+	_ "github.com/ilysha-v/authboss/register"
+	_ "github.com/ilysha-v/authboss/remember"
 
 	"github.com/aarondl/tpl"
 	"github.com/gorilla/schema"
@@ -51,6 +51,7 @@ func setupAuthboss() {
 	Ab.ViewsPath = "ab_views"
 	Ab.RegisterOKPath = "/"
 	Ab.AuthLoginOKPath = "/"
+	Ab.AuthLoginFailPath = "/login"
 
 	// Ab.OAuth2Providers = map[string]authboss.OAuth2Provider{
 	// 	"google": authboss.OAuth2Provider{

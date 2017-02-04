@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"gopkg.in/authboss.v1"
+	"github.com/ilysha-v/authboss"
 )
 
 var nextUserID int
@@ -81,6 +81,7 @@ func (s MemStorer) Put(key string, attr authboss.Attributes) error {
 }
 
 func (s MemStorer) Get(key string) (result interface{}, err error) {
+	fmt.Print(key)
 	user, ok := s.Users[key]
 	if !ok {
 		return nil, authboss.ErrUserNotFound
