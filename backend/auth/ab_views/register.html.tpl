@@ -23,11 +23,6 @@
 							<button class="btn btn-primary btn-block" type="submit">Register</button>
 						</div>
 					</div>
-					<div class="row">
-						<div class="col-md-offset-1 col-md-10">
-							<a class="btn btn-link btn-block" href="{{mountpathed "login"}}">Cancel</a>
-						</div>
-					</div>
 				</form>
 			</div>
 		</div>

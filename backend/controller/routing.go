@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -27,9 +28,9 @@ func Init() {
 	Router.StrictSlash(true)
 	Router.HandleFunc("/api/test", indexHandler)
 	Router.HandleFunc("/api/games", gamesHandler)
-	Router.HandleFunc("/api/userinfo", userInfoHandler)
+	Router.HandleFunc("/api/userinfo", userInfoHandler).Methods("GET")
+	Router.HandleFunc("/api/userinfo", updatUserInfoHandler).Methods("POST")
 	Router.HandleFunc("/api/whoami", whoAmI)
-	Router.HandleFunc("/api/errors", sessionErrorHandler)
 
 	authRouter := auth.Ab.NewRouter()
 	Router.PathPrefix("/api/auth").Handler(authRouter)
@@ -71,12 +72,25 @@ func userInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sessionErrorHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := auth.Ab.InitContext(w, r)
-	value, success := ctx.SessionStorer.Get("flash_error")
-	if success {
-		fmt.Fprint(w, value)
+func updatUserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	var newUserInfo backend.ShortUserInfo
+	b, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(b, &newUserInfo)
+	backend.Log.Infof(newUserInfo.Name)
+
+	user, err := auth.Ab.CurrentUser(w, r)
+	validationPassed := false
+	if user != nil && err == nil {
+		typedUser := user.(*auth.User)
+		if typedUser.Name == newUserInfo.Name {
+			validationPassed = true
+		}
 	}
+	if !validationPassed {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 }
 
 func gamesHandler(w http.ResponseWriter, r *http.Request) {

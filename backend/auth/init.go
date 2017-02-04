@@ -28,7 +28,7 @@ import (
 
 var (
 	Ab        = authboss.New()
-	database  = NewMemStorer()
+	database  = NewStorer()
 	viewsPath = configuration.GetViewsPath()
 	templates = tpl.Must(tpl.Load(viewsPath+"/views", viewsPath+"/views/partials", "layout.html.tpl", funcs))
 	schemaDec = schema.NewDecoder()

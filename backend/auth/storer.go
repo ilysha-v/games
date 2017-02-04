@@ -6,9 +6,10 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ilysha-v/authboss"
+	"github.com/ilysha-v/games/backend/configuration"
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
-
-var nextUserID int
 
 type User struct {
 	ID   int
@@ -41,60 +42,64 @@ type User struct {
 	// Remember is in another table
 }
 
-type MemStorer struct {
+type MongoStorer struct {
 	Users  map[string]User
 	Tokens map[string][]string
 }
 
-func NewMemStorer() *MemStorer {
-	return &MemStorer{
-		Users: map[string]User{
-			"zeratul@heroes.com": User{
-				ID:        1,
-				Name:      "Zeratul",
-				Password:  "$2a$10$XtW/BrS5HeYIuOCXYe8DFuInetDMdaarMUJEOg/VA/JAIDgw3l4aG", // pass = 1234
-				Email:     "zeratul@heroes.com",
-				Confirmed: true,
-			},
-		},
-		Tokens: make(map[string][]string),
-	}
+func NewStorer() *MongoStorer {
+	return &MongoStorer{}
 }
 
-func (s MemStorer) Create(key string, attr authboss.Attributes) error {
+func openConnection() (*mgo.Session, *mgo.Collection) {
+	databaseHost := configuration.GetDatabaseHost()
+	session, err := mgo.Dial(databaseHost)
+	if err != nil {
+		panic(err)
+	}
+
+	collection := session.DB("games").C("users")
+	return session, collection
+}
+
+func (s MongoStorer) Create(key string, attr authboss.Attributes) error {
 	var user User
 	if err := attr.Bind(&user, true); err != nil {
 		return err
 	}
 
-	user.ID = nextUserID
-	nextUserID++
+	session, collection := openConnection()
+	defer session.Close()
 
-	s.Users[key] = user
-	fmt.Println("Create")
-	spew.Dump(s.Users)
+	err := collection.Insert(user)
+	if err != nil {
+		panic(err)
+	}
+
 	return nil
 }
 
-func (s MemStorer) Put(key string, attr authboss.Attributes) error {
+func (s MongoStorer) Put(key string, attr authboss.Attributes) error {
 	return s.Create(key, attr)
 }
 
-func (s MemStorer) Get(key string) (result interface{}, err error) {
-	fmt.Print(key)
-	user, ok := s.Users[key]
-	if !ok {
-		return nil, authboss.ErrUserNotFound
+func (s MongoStorer) Get(key string) (result interface{}, err error) {
+	session, collection := openConnection()
+	defer session.Close()
+	var user User
+	err = collection.Find(bson.M{"email": key}).One(&user)
+	if err != nil {
+		panic(err)
 	}
 
 	return &user, nil
 }
 
-func (s MemStorer) PutOAuth(uid, provider string, attr authboss.Attributes) error {
+func (s MongoStorer) PutOAuth(uid, provider string, attr authboss.Attributes) error {
 	return s.Create(uid+provider, attr)
 }
 
-func (s MemStorer) GetOAuth(uid, provider string) (result interface{}, err error) {
+func (s MongoStorer) GetOAuth(uid, provider string) (result interface{}, err error) {
 	user, ok := s.Users[uid+provider]
 	if !ok {
 		return nil, authboss.ErrUserNotFound
@@ -103,21 +108,23 @@ func (s MemStorer) GetOAuth(uid, provider string) (result interface{}, err error
 	return &user, nil
 }
 
-func (s MemStorer) AddToken(key, token string) error {
+func (s MongoStorer) AddToken(key, token string) error {
+	fmt.Print("add called")
 	s.Tokens[key] = append(s.Tokens[key], token)
 	fmt.Println("AddToken")
 	spew.Dump(s.Tokens)
 	return nil
 }
 
-func (s MemStorer) DelTokens(key string) error {
+func (s MongoStorer) DelTokens(key string) error {
 	delete(s.Tokens, key)
 	fmt.Println("DelTokens")
 	spew.Dump(s.Tokens)
 	return nil
 }
 
-func (s MemStorer) UseToken(givenKey, token string) error {
+func (s MongoStorer) UseToken(givenKey, token string) error {
+	fmt.Print("use called")
 	toks, ok := s.Tokens[givenKey]
 	if !ok {
 		return authboss.ErrTokenNotFound
@@ -134,7 +141,7 @@ func (s MemStorer) UseToken(givenKey, token string) error {
 	return authboss.ErrTokenNotFound
 }
 
-func (s MemStorer) ConfirmUser(tok string) (result interface{}, err error) {
+func (s MongoStorer) ConfirmUser(tok string) (result interface{}, err error) {
 	fmt.Println("==============", tok)
 
 	for _, u := range s.Users {
@@ -146,7 +153,7 @@ func (s MemStorer) ConfirmUser(tok string) (result interface{}, err error) {
 	return nil, authboss.ErrUserNotFound
 }
 
-func (s MemStorer) RecoverUser(rec string) (result interface{}, err error) {
+func (s MongoStorer) RecoverUser(rec string) (result interface{}, err error) {
 	for _, u := range s.Users {
 		if u.RecoverToken == rec {
 			return &u, nil

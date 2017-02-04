@@ -14,9 +14,10 @@
 						<input  type="password" class="form-control" name="password" placeholder="Password">
 					</div>
 					{{if .showRemember}}
-					<div class="form-group">
+					<div class="form-group row">
 						<input type="checkbox" name="rm" value="true"> Remember Me
 					</div>
+				</br>
 					{{end}}
 					<input type="hidden" name="{{.xsrfName}}" value="{{.xsrfToken}}" />
 					<div class="row">
