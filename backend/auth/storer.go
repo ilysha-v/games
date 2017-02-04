@@ -52,8 +52,7 @@ func NewStorer() *MongoStorer {
 }
 
 func openConnection() (*mgo.Session, *mgo.Collection) {
-	databaseHost := configuration.GetDatabaseHost()
-	session, err := mgo.Dial(databaseHost)
+	session, err := mgo.Dial(configuration.GetDatabaseHost())
 	if err != nil {
 		panic(err)
 	}
@@ -85,11 +84,13 @@ func (s MongoStorer) Put(key string, attr authboss.Attributes) error {
 
 func (s MongoStorer) Get(key string) (result interface{}, err error) {
 	session, collection := openConnection()
+
 	defer session.Close()
+
 	var user User
 	err = collection.Find(bson.M{"email": key}).One(&user)
 	if err != nil {
-		panic(err)
+		return nil, authboss.ErrUserNotFound
 	}
 
 	return &user, nil
